@@ -11,6 +11,7 @@ module hippo_aggregator::aggregator {
     use aptos_std::type_info::{TypeInfo, type_of};
     use aptos_framework::aptos_coin::AptosCoin;
     use aptos_framework::coin::Coin;
+
     // use ditto::staked_coin;
     // use tortuga::staked_aptos_coin;
 
@@ -174,13 +175,9 @@ module hippo_aggregator::aggregator {
         coin_in: Coin<InputCoin>,
     ):(Coin<InputCoin>,Coin<OutputCoin>) acquires EventStore {
         let coin_in_value = coin::value<InputCoin>(&coin_in);
-        let _ = is_x_to_y;
         let (x_remaining,y_out) = if (dex_type == DEX_PONTEM) {
             use liquidswap::router;
             router::swap_coin_for_exact_coin<InputCoin, OutputCoin, E>(coin_in, amount_out)
-        }
-        else if (dex_type == DEX_APTOSWAP) {
-           abort E_UNSUPPORTED_FIXEDOUT_SWAP
         }
         else if (dex_type == DEX_AUX) {
             if (pool_type == AUX_TYPE_AMM){
@@ -204,18 +201,6 @@ module hippo_aggregator::aggregator {
             else {
                 abort E_UNKNOWN_POOL_TYPE
             }
-        }
-        else if (dex_type == DEX_ANIMESWAP) {
-            use SwapDeployer::AnimeSwapPoolV1;
-            let amount_in = AnimeSwapPoolV1::get_amounts_in_1_pair<InputCoin, OutputCoin>(amount_out);
-            let anime_coin_in = coin::extract(&mut coin_in, amount_in);
-            (coin_in, AnimeSwapPoolV1::swap_coins_for_coins<InputCoin, OutputCoin>(anime_coin_in))
-        }
-        else if (dex_type == DEX_CETUS){
-            abort E_UNSUPPORTED_FIXEDOUT_SWAP
-        }
-        else if (dex_type == DEX_PANCAKE){
-            abort E_UNSUPPORTED_FIXEDOUT_SWAP
         }
         else {
             abort E_UNKNOWN_DEX

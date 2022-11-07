@@ -19,15 +19,4 @@ module pancake::router {
             swap_utils::get_amount_out(amount_in, rin, rout)
         }
     }
-
-    public fun get_amount_in<InputCoin, OutputCoin>(amount_out: u64, is_forward: bool): u64 {
-        if (is_forward){
-            let (rin, rout, _) = swap::token_reserves<InputCoin, OutputCoin>();
-            swap_utils::get_amount_in(amount_out, rin, rout)
-        } else {
-            let (rout,rin, _) = swap::token_reserves<OutputCoin, InputCoin>();
-            swap_utils::get_amount_in(amount_out, rin, rout)
-        }
-
-    }
 }
