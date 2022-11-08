@@ -28,6 +28,7 @@ module hippo_aggregator::aggregator {
     const DEX_ANIMESWAP: u8 = 9;
     const DEX_CETUS: u8 = 10;
     const DEX_PANCAKE: u8 = 11;
+    const DEX_OBRIC: u8 = 12;
 
     const HIPPO_CONSTANT_PRODUCT:u64 = 1;
     const HIPPO_PIECEWISE:u64 = 3;
@@ -169,7 +170,7 @@ module hippo_aggregator::aggregator {
     public fun swap_with_fixed_output_direct<InputCoin, OutputCoin, E>(
         dex_type: u8,
         pool_type: u64,
-        is_x_to_y: bool,
+        _is_x_to_y: bool,
         max_in: u64,
         amount_out: u64,
         coin_in: Coin<InputCoin>,
@@ -316,6 +317,15 @@ module hippo_aggregator::aggregator {
         else if (dex_type == DEX_PANCAKE){
             use pancake::router;
             (option::none(),router::swap_exact_x_to_y_direct_external<X, Y>(x_in))
+        }
+        else if (dex_type == DEX_OBRIC){
+            use obric::PieceSwap;
+            if (is_x_to_y) {
+                (option::none(), PieceSwap::swap_x_to_y_direct<X, Y>(x_in))
+            }
+            else {
+                (option::none(), PieceSwap::swap_y_to_x_direct<Y, X>(x_in))
+            }
         }
         else {
             abort E_UNKNOWN_DEX
