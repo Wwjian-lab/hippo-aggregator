@@ -1,6 +1,11 @@
 # hippo-aggregator
 
 Currently supports:
-- Hippo Swap
+- Animeswap
+- Aptoswap
+- AUX
+- Cetus
 - Econia
+- Obric
+- Pancake
 - Pontem
