@@ -1,17 +1,11 @@
 import {
-  AptosParserRepo,
-  getTypeTagFullname,
-  StructTag,
   parseTypeTagOrThrow,
   u8,
   u64,
   u128,
   print,
   strToU8,
-  u8str,
-  DummyCache,
   ActualStringClass,
-  sendPayloadTx,
   sendPayloadTxAndLog,
   getSimulationKeys,
 } from "@manahippo/move-to-ts";
@@ -1582,12 +1576,7 @@ const testSwapApi = async (
   const inputAmt = parseFloat(xInAmt);
   const isReload = true;
   console.log("Fetching quotes...");
-  const result = await agg.requestQuotesViaAPI(
-    inputAmt,
-    xInfo,
-    yInfo,
-    isReload
-  );
+  const result = await agg.api.requestQuotes(inputAmt, xInfo, yInfo, isReload);
   if (result.allRoutesCount === 0) {
     console.log(`No quote from ${symbolX} to ${symbolY}`);
     return;
