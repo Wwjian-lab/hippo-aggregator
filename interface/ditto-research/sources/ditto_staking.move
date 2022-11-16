@@ -8,11 +8,11 @@ module ditto::ditto_staking{
     public entry fun instant_unstake(_user: &signer, _amount: u64){
     }
 
-    public fun exchange_aptos(aptos: coin::Coin<AptosCoin>): coin::Coin<StakedAptos>{
+    public fun exchange_aptos(aptos: coin::Coin<AptosCoin>, _user: address): coin::Coin<StakedAptos>{
         coin::destroy_zero(aptos);
         coin::zero<StakedAptos>()
     }
-    public fun exchange_staptos(staptos: coin::Coin<StakedAptos>): coin::Coin<AptosCoin>{
+    public fun exchange_staptos(staptos: coin::Coin<StakedAptos>, _user: address): coin::Coin<AptosCoin>{
         coin::destroy_zero(staptos);
         coin::zero<AptosCoin>()
     }
