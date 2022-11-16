@@ -99,11 +99,20 @@ module hippo_aggregator::aggregator {
 
     #[cmd]
     public entry fun create_tortuga_signer(admin: &signer){
+        use TortugaGovernance::staked_aptos_coin::StakedAptosCoin;
         assert!(signer::address_of(admin) == @hippo_aggregator, E_NOT_ADMIN);
-        let (_signer, signerCapability) = account::create_resource_account(admin,b"tortuga_signer");
-        move_to(admin,TortugaSigner{
-            signerCapability
-        });
+        let (signer, signerCapability) = account::create_resource_account(admin,b"tortuga_signer");
+        if (!exists<TortugaSigner>(@hippo_aggregator)){
+            move_to(admin,TortugaSigner{
+                signerCapability
+            });
+        };
+        if (!coin::is_account_registered<AptosCoin>(address_of(&signer))){
+            coin::register<AptosCoin>(&signer);
+        };
+        if (coin::is_account_registered<StakedAptosCoin>(address_of(&signer))){
+            coin::register<StakedAptosCoin>(&signer);
+        };
     }
 
     #[cmd]
