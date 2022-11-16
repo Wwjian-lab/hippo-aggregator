@@ -48,6 +48,7 @@ module hippo_aggregator::aggregator {
     const E_UNSUPPORTED_FIXEDOUT_SWAP: u64 = 11;
     const E_OUTPUT_NOT_EQAULS_REQUEST: u64 = 12;
 
+
     struct EventStore has key {
         swap_step_events: EventHandle<SwapStepEvent>,
     }
@@ -102,8 +103,9 @@ module hippo_aggregator::aggregator {
 
     #[cmd]
     public entry fun init_coin_store_all(admin: &signer){
+        use ditto::staked_coin;
         init_coin_store<AptosCoin>(admin);
-        // init_coin_store<staked_coin::StakedAptos>(admin);
+        init_coin_store<staked_coin::StakedAptos>(admin);
         // init_coin_store<staked_aptos_coin::StakedAptosCoin>(admin);
     }
 
@@ -135,7 +137,7 @@ module hippo_aggregator::aggregator {
 
     fun change_coin_type<X, Y>(x_coin: coin::Coin<X>): coin::Coin<Y> acquires CoinStore {
         assert!(type_of<X>() == type_of<Y>(), E_TYPE_NOT_EQUAL);
-        assert!(exists<CoinStore<X>>(@hippo_aggregator), 0);
+        assert!(exists<CoinStore<X>>(@hippo_aggregator), E_COIN_STORE_NOT_EXITES);
         let amount = coin::value(&x_coin);
         let x_coin_store = borrow_global_mut<CoinStore<X>>(@hippo_aggregator);
         coin::merge(&mut x_coin_store.balance, x_coin);
