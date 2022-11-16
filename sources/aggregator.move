@@ -47,7 +47,6 @@ module hippo_aggregator::aggregator {
     const E_UNSUPPORTED: u64 = 10;
     const E_UNSUPPORTED_FIXEDOUT_SWAP: u64 = 11;
     const E_OUTPUT_NOT_EQAULS_REQUEST: u64 = 12;
-    const E_INVALID_DIRECTION: u64 = 12;
 
     struct EventStore has key {
         swap_step_events: EventHandle<SwapStepEvent>,
@@ -259,33 +258,27 @@ module hippo_aggregator::aggregator {
         }
         */
         else if (dex_type == DEX_DITTO) {
-            use ditto::ditto_staking;
-            use ditto::staked_coin;
-            if (type_of<X>() == type_of<AptosCoin>() && type_of<Y>() == type_of<staked_coin::StakedAptos>()){
-                (
-                    option::none(),
-                    change_coin_type<staked_coin::StakedAptos, Y>(
-                        ditto_staking::exchange_aptos(
-                            change_coin_type<X, AptosCoin>(x_in),
-                            @hippo_aggregator
-                        )
-                    )
-                )
-            }
-            else if (type_of<X>() == type_of<staked_coin::StakedAptos>() && type_of<Y>() == type_of<AptosCoin>()){
-                (
-                    option::none(),
-                    change_coin_type<AptosCoin, Y>(
-                        ditto_staking::exchange_staptos(
-                            change_coin_type<X, staked_coin::StakedAptos>(x_in),
-                            @hippo_aggregator
-                        )
-                    )
-                )
-            }
-            else {
-                abort E_INVALID_PAIR_OF_DITTO
-            }
+            coin::destroy_zero(change_coin_type<X, AptosCoin>(x_in));
+            abort E_UNSUPPORTED
+            // use ditto::ditto_staking;
+            // use ditto::staked_coin;
+            // if (type_of<X>() == type_of<AptosCoin>() && type_of<Y>() == type_of<staked_coin::StakedAptos>()){
+            //     (
+            //         option::none(),
+            //         change_coin_type<staked_coin::StakedAptos, Y>(
+            //             ditto_staking::exchange_aptos(
+            //                 change_coin_type<X, AptosCoin>(x_in),
+            //                 @hippo_aggregator
+            //             )
+            //         )
+            //     )
+            // }
+            // else if (type_of<X>() == type_of<staked_coin::StakedAptos>() && type_of<Y>() == type_of<AptosCoin>()){
+            //     abort E_UNSUPPORTED
+            // }
+            // else {
+            //     abort E_INVALID_PAIR_OF_DITTO
+            // }
         }
        /* else if (dex_type == DEX_TORTUGA){
             use tortuga::stake_router;
