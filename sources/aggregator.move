@@ -258,27 +258,25 @@ module hippo_aggregator::aggregator {
         }
         */
         else if (dex_type == DEX_DITTO) {
-            coin::destroy_zero(change_coin_type<X, AptosCoin>(x_in));
-            abort E_UNSUPPORTED
-            // use ditto::ditto_staking;
-            // use ditto::staked_coin;
-            // if (type_of<X>() == type_of<AptosCoin>() && type_of<Y>() == type_of<staked_coin::StakedAptos>()){
-            //     (
-            //         option::none(),
-            //         change_coin_type<staked_coin::StakedAptos, Y>(
-            //             ditto_staking::exchange_aptos(
-            //                 change_coin_type<X, AptosCoin>(x_in),
-            //                 @hippo_aggregator
-            //             )
-            //         )
-            //     )
-            // }
-            // else if (type_of<X>() == type_of<staked_coin::StakedAptos>() && type_of<Y>() == type_of<AptosCoin>()){
-            //     abort E_UNSUPPORTED
-            // }
-            // else {
-            //     abort E_INVALID_PAIR_OF_DITTO
-            // }
+            use ditto::ditto_staking;
+            use ditto::staked_coin;
+            if (type_of<X>() == type_of<AptosCoin>() && type_of<Y>() == type_of<staked_coin::StakedAptos>()){
+                (
+                    option::none(),
+                    change_coin_type<staked_coin::StakedAptos, Y>(
+                        ditto_staking::exchange_aptos(
+                            change_coin_type<X, AptosCoin>(x_in),
+                            @hippo_aggregator
+                        )
+                    )
+                )
+            }
+            else if (type_of<X>() == type_of<staked_coin::StakedAptos>() && type_of<Y>() == type_of<AptosCoin>()){
+                abort E_UNSUPPORTED
+            }
+            else {
+                abort E_INVALID_PAIR_OF_DITTO
+            }
         }
        /* else if (dex_type == DEX_TORTUGA){
             use tortuga::stake_router;
