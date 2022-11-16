@@ -1,0 +1,9 @@
+[package]
+name = "lending"
+version = "0.1.0"
+
+[dependencies]
+AptosFramework = {git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework/", rev = "72421d32d77f1877ded478e96f5b95914de1df91"}
+
+[addresses]
+lending = "137b14ca0ce5e83296ee5fbc0c8713d64761f28f2d8d84004189768604c3f35e"

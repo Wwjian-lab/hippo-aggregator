@@ -15,6 +15,7 @@ AnimeSwapV1 = { local = "./interface/animeswap" }
 Cetue-AMM = { local = "./interface/cetus-amm" }
 PancakeSwap = { local = "./interface/pancake" }
 obric-swap = { local = "./interface/obric" }
+lending = { local = "./interface/lending" }
 
 [addresses]
 hippo_aggregator = "89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039"

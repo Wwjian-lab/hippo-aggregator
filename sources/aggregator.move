@@ -29,11 +29,18 @@ module hippo_aggregator::aggregator {
     const DEX_CETUS: u8 = 10;
     const DEX_PANCAKE: u8 = 11;
     const DEX_OBRIC: u8 = 12;
+    const LENDING: u8 = 13;
+
 
     const HIPPO_CONSTANT_PRODUCT:u64 = 1;
     const HIPPO_PIECEWISE:u64 = 3;
     const AUX_TYPE_AMM:u64 = 0;
     const AUX_TYPE_MARKET:u64 = 1;
+    const LENDING_DEPOSIT: u64 = 4;
+    const LENDING_WITHDRAW: u64 = 5;
+    const LENDING_BORROW: u64 = 6;
+    const LENDING_REPAY: u64 = 7;
+
 
     const E_UNKNOWN_POOL_TYPE: u64 = 1;
     const E_OUTPUT_LESS_THAN_MINIMUM: u64 = 2;
@@ -47,6 +54,7 @@ module hippo_aggregator::aggregator {
     const E_UNSUPPORTED: u64 = 10;
     const E_UNSUPPORTED_FIXEDOUT_SWAP: u64 = 11;
     const E_OUTPUT_NOT_EQAULS_REQUEST: u64 = 12;
+    const E_INCORRECT_LENDING_PARAMETER: u64 = 13;
 
     struct EventStore has key {
         swap_step_events: EventHandle<SwapStepEvent>,
@@ -161,13 +169,14 @@ module hippo_aggregator::aggregator {
         amount_out: u64,
     ) acquires EventStore {
         let coin_in = coin::withdraw<InputCoin>(sender, max_in);
-        let (coin_in, coin_out) = swap_with_fixed_output_direct<InputCoin,OutputCoin,E>(dex_type,pool_type,is_x_to_y,max_in,amount_out,coin_in);
+        let (coin_in, coin_out) = swap_with_fixed_output_direct<InputCoin,OutputCoin,E>(sender, dex_type,pool_type,is_x_to_y,max_in,amount_out,coin_in);
         assert!(coin::value(&coin_out) == amount_out, E_OUTPUT_NOT_EQAULS_REQUEST);
         check_and_deposit(sender, coin_in);
         check_and_deposit(sender, coin_out);
     }
 
     public fun swap_with_fixed_output_direct<InputCoin, OutputCoin, E>(
+        sender: &signer,
         dex_type: u8,
         pool_type: u64,
         _is_x_to_y: bool,
@@ -202,6 +211,29 @@ module hippo_aggregator::aggregator {
             else {
                 abort E_UNKNOWN_POOL_TYPE
             }
+        }
+        else if (dex_type == LENDING) {
+            check_and_deposit(sender, coin_in);
+            if (pool_type ==  LENDING_DEPOSIT) {
+                use lending::lending_protocol;
+                assert!( amount_out == 0, E_INCORRECT_LENDING_PARAMETER );
+                lending_protocol::deposit<InputCoin>(sender, max_in);
+            }
+            else if (pool_type == LENDING_WITHDRAW ) {
+                use lending::lending_protocol;
+                assert!( max_in == 0, E_INCORRECT_LENDING_PARAMETER );
+                lending_protocol::withdraw<OutputCoin>(sender, amount_out);
+            }
+            else if (pool_type == LENDING_WITHDRAW ) {
+                use lending::lending_protocol;
+                assert!( max_in == 0, E_INCORRECT_LENDING_PARAMETER );
+                lending_protocol::borrow<OutputCoin>(sender, amount_out);
+            } else if (pool_type == LENDING_REPAY ) {
+                use lending::lending_protocol;
+                assert!( amount_out == 0, E_INCORRECT_LENDING_PARAMETER );
+                lending_protocol::repay<InputCoin>(sender, max_in);
+            };
+            (coin::zero<InputCoin>(), coin::zero<OutputCoin>())
         }
         else {
             abort E_UNKNOWN_DEX
