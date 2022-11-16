@@ -8,7 +8,8 @@ CoinList = { git = "https://github.com/hippospace/aptos-coin-list.git", subdir =
 Liquidswap = { local = "./interface/pontem-Liquidswap" }
 #basiq = { local = "./interface/basiq-basiq" }
 ditto-staking = { local = "./interface/ditto-research" }
-tortuga = { local = "./interface/tortuga" }
+Tortuga = { local = "./interface/tortuga" }
+TortugaGovernance = { local = "./interface/tortuga-stake-coin" }
 Aptoswap = { local = "./interface/aptoswap" }
 aux = { local = "./interface/aux"}
 AnimeSwapV1 = { local = "./interface/animeswap" }

@@ -121,7 +121,7 @@ module hippo_aggregator::aggregator {
     #[cmd]
     public entry fun init_coin_store_all(admin: &signer){
         use ditto::staked_coin;
-        use tortuga::staked_aptos_coin;
+        use TortugaGovernance::staked_aptos_coin;
         init_coin_store<AptosCoin>(admin);
         init_coin_store<staked_coin::StakedAptos>(admin);
         init_coin_store<staked_aptos_coin::StakedAptosCoin>(admin);
@@ -300,7 +300,7 @@ module hippo_aggregator::aggregator {
         }
         else if (dex_type == DEX_TORTUGA){
             use tortuga::stake_router;
-            use tortuga::staked_aptos_coin;
+            use TortugaGovernance::staked_aptos_coin;
             if (
                 type_of<X>() == type_of<AptosCoin>() &&
                     type_of<Y>() == type_of<staked_aptos_coin::StakedAptosCoin>()){
