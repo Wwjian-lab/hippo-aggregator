@@ -96,6 +96,9 @@ module hippo_aggregator::aggregator {
     public entry fun init_coin_store<X>(admin: &signer) {
         let admin_addr = signer::address_of(admin);
         assert!(admin_addr == @hippo_aggregator, E_NOT_ADMIN);
+        if (exists<CoinStore<X>>(@hippo_aggregator)){
+            return
+        };
         move_to(admin, CoinStore<X>{
             balance: coin::zero<X>()
         });
@@ -104,9 +107,10 @@ module hippo_aggregator::aggregator {
     #[cmd]
     public entry fun init_coin_store_all(admin: &signer){
         use ditto::staked_coin;
+        use tortuga::staked_aptos_coin;
         init_coin_store<AptosCoin>(admin);
         init_coin_store<staked_coin::StakedAptos>(admin);
-        // init_coin_store<staked_aptos_coin::StakedAptosCoin>(admin);
+        init_coin_store<staked_aptos_coin::StakedAptosCoin>(admin);
     }
 
     #[test_only]
@@ -280,7 +284,7 @@ module hippo_aggregator::aggregator {
                 abort E_INVALID_PAIR_OF_DITTO
             }
         }
-       /* else if (dex_type == DEX_TORTUGA){
+        else if (dex_type == DEX_TORTUGA){
             use tortuga::stake_router;
             use tortuga::staked_aptos_coin;
             if (
@@ -299,7 +303,7 @@ module hippo_aggregator::aggregator {
             else {
                 abort E_INVALID_PAIR_OF_TORTUGA
             }
-        }*/
+        }
         else if (dex_type == DEX_APTOSWAP) {
             use Aptoswap::pool;
             if (is_x_to_y) {
