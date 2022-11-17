@@ -6,11 +6,14 @@ import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {OptionTransaction} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types} from "aptos";
+import * as Error from "./error";
+import * as Features from "./features";
 import * as String from "./string";
 export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "type_info";
 
+export const E_NATIVE_FUN_NOT_AVAILABLE : U64 = u64("1");
 
 
 export class TypeInfo 
@@ -63,6 +66,23 @@ export function account_address_ (
   return $.copy(type_info.account_address);
 }
 
+export function chain_id_ (
+  $c: AptosDataCache,
+): U8 {
+  if (!Features.aptos_stdlib_chain_id_enabled_($c)) {
+    throw $.abortCode(Error.invalid_state_($.copy(E_NATIVE_FUN_NOT_AVAILABLE), $c));
+  }
+  else{
+  }
+  return chain_id_internal_($c);
+}
+
+export function chain_id_internal_ (
+  $c: AptosDataCache,
+): U8 {
+  return $.aptos_std_type_info_chain_id_internal($c);
+
+}
 export function module_name_ (
   type_info: TypeInfo,
   $c: AptosDataCache,
@@ -91,6 +111,31 @@ export function type_of_ (
   return $.aptos_std_type_info_type_of($c, [$p[0]]);
 
 }
+export function verify_type_of_ (
+  $c: AptosDataCache,
+): void {
+  let account_address, module_name, struct_name, type_info;
+  type_info = type_of_($c, [new SimpleStructTag(TypeInfo)]);
+  account_address = account_address_(type_info, $c);
+  module_name = module_name_(type_info, $c);
+  struct_name = struct_name_(type_info, $c);
+  ;
+  return;
+}
+
+export function verify_type_of_generic_ (
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <T>*/
+): void {
+  let account_address, module_name, struct_name, type_info;
+  type_info = type_of_($c, [$p[0]]);
+  account_address = account_address_(type_info, $c);
+  module_name = module_name_(type_info, $c);
+  struct_name = struct_name_(type_info, $c);
+  ;
+  return;
+}
+
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::type_info::TypeInfo", TypeInfo.TypeInfoParser);
 }

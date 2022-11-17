@@ -17,6 +17,7 @@ export const moduleAddress = new HexString("0x1");
 export const moduleName = "multi_ed25519";
 
 export const BITMAP_NUM_OF_BYTES : U64 = u64("4");
+export const E_INVALID_THRESHOLD_OR_NUMBER_OF_SIGNERS : U64 = u64("3");
 export const E_WRONG_PUBKEY_SIZE : U64 = u64("1");
 export const E_WRONG_SIGNATURE_SIZE : U64 = u64("2");
 export const INDIVIDUAL_PUBLIC_KEY_NUM_BYTES : U64 = u64("32");

@@ -18,6 +18,7 @@ export const moduleAddress = new HexString("0x1");
 export const moduleName = "resource_account";
 
 export const ECONTAINER_NOT_PUBLISHED : U64 = u64("1");
+export const EUNAUTHORIZED_NOT_OWNER : U64 = u64("2");
 export const ZERO_AUTH_KEY : U8[] = [u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0"), u8("0")];
 
 
@@ -181,6 +182,9 @@ export function retrieve_resource_account_cap_ (
   }
   resource_addr = Signer.address_of_(resource, $c);
   container = $c.borrow_global_mut<Container>(new SimpleStructTag(Container), $.copy(source_addr));
+  if (!Simple_map.contains_key_(container.store, resource_addr, $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "account", "SignerCapability", [])])) {
+    throw $.abortCode(Error.invalid_argument_($.copy(EUNAUTHORIZED_NOT_OWNER), $c));
+  }
   [_resource_addr, signer_cap] = Simple_map.remove_(container.store, resource_addr, $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "account", "SignerCapability", [])]);
   [resource_signer_cap, empty_container] = [signer_cap, (Simple_map.length_(container.store, $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "account", "SignerCapability", [])])).eq((u64("0")))];
   if (empty_container) {

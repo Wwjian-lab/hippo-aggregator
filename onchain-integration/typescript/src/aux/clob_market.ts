@@ -6,49 +6,52 @@ import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {OptionTransaction} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types} from "aptos";
-export const packageName = "Liquidswap";
-export const moduleAddress = new HexString("0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12");
-export const moduleName = "scripts";
+import * as Stdlib from "../stdlib";
+export const packageName = "aux";
+export const moduleAddress = new HexString("0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541");
+export const moduleName = "clob_market";
 
 
-export function register_pool_and_add_liquidity_ (
-  _creator: HexString,
-  _x_amount: U64,
-  _x_min_amount: U64,
-  _y_amount: U64,
-  _y_min_amount: U64,
+export function load_market_into_event_ (
+  _sender: HexString,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y, LP>*/
+  $p: TypeTag[], /* <B, Q>*/
 ): void {
   return;
 }
 
 
-export function buildPayload_register_pool_and_add_liquidity (
-  _x_amount: U64,
-  _x_min_amount: U64,
-  _y_amount: U64,
-  _y_min_amount: U64,
-  $p: TypeTag[], /* <X, Y, LP>*/
+export function buildPayload_load_market_into_event (
+  $p: TypeTag[], /* <B, Q>*/
   isJSON = false,
 ): TxnBuilderTypes.TransactionPayloadEntryFunction
    | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString("0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12"),
-    "scripts",
-    "register_pool_and_add_liquidity",
+    new HexString("0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541"),
+    "clob_market",
+    "load_market_into_event",
     typeParamStrings,
-    [
-      _x_amount,
-      _x_min_amount,
-      _y_amount,
-      _y_min_amount,
-    ],
+    [],
     isJSON,
   );
 
 }
+export function place_market_order_mut_ (
+  _sender_addr: HexString,
+  _base_coin: Stdlib.Coin.Coin,
+  _quote_coin: Stdlib.Coin.Coin,
+  _is_bid: boolean,
+  _order_type: U64,
+  _limit_price: U64,
+  _quantity: U64,
+  _client_order_id: U128,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <B, Q>*/
+): [U64, U64] {
+  return [u64("0"), u64("0")];
+}
+
 export function loadParsers(repo: AptosParserRepo) {
 }
 export class App {
@@ -60,28 +63,20 @@ export class App {
   }
   get moduleAddress() {{ return moduleAddress; }}
   get moduleName() {{ return moduleName; }}
-  payload_register_pool_and_add_liquidity(
-    _x_amount: U64,
-    _x_min_amount: U64,
-    _y_amount: U64,
-    _y_min_amount: U64,
-    $p: TypeTag[], /* <X, Y, LP>*/
+  payload_load_market_into_event(
+    $p: TypeTag[], /* <B, Q>*/
     isJSON = false,
   ): TxnBuilderTypes.TransactionPayloadEntryFunction
         | Types.TransactionPayload_EntryFunctionPayload {
-    return buildPayload_register_pool_and_add_liquidity(_x_amount, _x_min_amount, _y_amount, _y_min_amount, $p, isJSON);
+    return buildPayload_load_market_into_event($p, isJSON);
   }
-  async register_pool_and_add_liquidity(
+  async load_market_into_event(
     _account: AptosAccount,
-    _x_amount: U64,
-    _x_min_amount: U64,
-    _y_amount: U64,
-    _y_min_amount: U64,
-    $p: TypeTag[], /* <X, Y, LP>*/
+    $p: TypeTag[], /* <B, Q>*/
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload__ = buildPayload_register_pool_and_add_liquidity(_x_amount, _x_min_amount, _y_amount, _y_min_amount, $p, _isJSON);
+    const payload__ = buildPayload_load_market_into_event($p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

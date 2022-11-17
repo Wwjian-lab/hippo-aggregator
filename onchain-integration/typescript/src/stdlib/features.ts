@@ -13,8 +13,10 @@ export const packageName = "MoveStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "features";
 
+export const APTOS_STD_CHAIN_ID_NATIVES : U64 = u64("4");
 export const CODE_DEPENDENCY_CHECK : U64 = u64("1");
 export const EFRAMEWORK_SIGNER_NEEDED : U64 = u64("1");
+export const SHA_512_AND_RIPEMD_160_NATIVES : U64 = u64("3");
 export const TREAT_FRIEND_AS_PRIVATE : U64 = u64("2");
 
 
@@ -58,6 +60,12 @@ export class Features
   }
 
 }
+export function aptos_stdlib_chain_id_enabled_ (
+  $c: AptosDataCache,
+): boolean {
+  return is_enabled_($.copy(APTOS_STD_CHAIN_ID_NATIVES), $c);
+}
+
 export function change_feature_flags_ (
   framework: HexString,
   enable: U64[],
@@ -116,6 +124,18 @@ export function contains_ (
   return temp$1;
 }
 
+export function get_aptos_stdlib_chain_id_feature_ (
+  $c: AptosDataCache,
+): U64 {
+  return $.copy(APTOS_STD_CHAIN_ID_NATIVES);
+}
+
+export function get_sha_512_and_ripemd_160_feature_ (
+  $c: AptosDataCache,
+): U64 {
+  return $.copy(SHA_512_AND_RIPEMD_160_NATIVES);
+}
+
 export function is_enabled_ (
   feature: U64,
   $c: AptosDataCache,
@@ -152,6 +172,12 @@ export function set_ (
     $.set(entry, ($.copy(entry)).and((u8("255")).xor($.copy(bit_mask))));
   }
   return;
+}
+
+export function sha_512_and_ripemd_160_enabled_ (
+  $c: AptosDataCache,
+): boolean {
+  return is_enabled_($.copy(SHA_512_AND_RIPEMD_160_NATIVES), $c);
 }
 
 export function treat_friend_as_private_ (
