@@ -1,4 +1,4 @@
-
+#[test_only]
 module hippo_aggregator::aggregator_test {
     #[test_only]
     use hippo_aggregator::aggregator::process_fee;

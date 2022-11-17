@@ -13,10 +13,6 @@ module hippo_aggregator::aggregator {
     use aptos_framework::coin::Coin;
     use std::signer::address_of;
 
-    friend hippo_aggregator::aggregator_test;
-    // use ditto::staked_coin;
-    // use tortuga::staked_aptos_coin;
-
     const MAX_U64: u64 = 0xffffffffffffffff;
 
     const DEX_HIPPO: u8 = 1;
@@ -710,7 +706,7 @@ module hippo_aggregator::aggregator {
 
     }
 
-    public(friend) fun process_fee<X>(coin: &mut Coin<X>, fee_to: address, fee_bips: u8){
+    public fun process_fee<X>(coin: &mut Coin<X>, fee_to: address, fee_bips: u8){
         if (fee_bips == 0){
             return
         };
