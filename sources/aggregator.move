@@ -13,6 +13,7 @@ module hippo_aggregator::aggregator {
     use aptos_framework::coin::Coin;
     use std::signer::address_of;
 
+    friend hippo_aggregator::aggregator_test;
     // use ditto::staked_coin;
     // use tortuga::staked_aptos_coin;
 
@@ -48,6 +49,7 @@ module hippo_aggregator::aggregator {
     const E_UNSUPPORTED: u64 = 10;
     const E_UNSUPPORTED_FIXEDOUT_SWAP: u64 = 11;
     const E_OUTPUT_NOT_EQAULS_REQUEST: u64 = 12;
+    const E_FEE_BIPS_TO_LARGE: u64 = 13;
 
 
     struct EventStore has key {
@@ -666,5 +668,65 @@ module hippo_aggregator::aggregator {
         check_and_deposit(sender, coin_m);
     }
 
+    #[cmd]
+    public entry fun swap_with_fees<X, Y, Z, OutCoin, E1, E2, E3>(
+        sender: &signer,
+        num_steps: u8,
+        first_dex_type: u8,
+        first_pool_type: u64,
+        first_is_x_to_y: bool, // first trade uses normal order
+        second_dex_type: u8,
+        second_pool_type: u64,
+        second_is_x_to_y: bool, // second trade uses normal order
+        third_dex_type: u8,
+        third_pool_type: u64,
+        third_is_x_to_y: bool, // second trade uses normal order
+        x_in: u64,
+        m_min_out: u64,
+        fee_to: address,
+        fee_bips: u8
+    )acquires EventStore, CoinStore, TortugaSigner {
+        let coin_x = coin::withdraw<X>(sender, x_in);
+        let (x_remain, y_remain, z_remain, coin_m) = swap_direct<X, Y, Z, OutCoin, E1, E2, E3>(
+            num_steps,
+            first_dex_type,
+            first_pool_type,
+            first_is_x_to_y,
+            second_dex_type,
+            second_pool_type,
+            second_is_x_to_y,
+            third_dex_type,
+            third_pool_type,
+            third_is_x_to_y,
+            coin_x
+        );
+        process_fee(&mut coin_m, fee_to, fee_bips);
+        assert!(coin::value(&coin_m) >= m_min_out, E_OUTPUT_LESS_THAN_MINIMUM);
 
+        check_and_deposit_opt(sender, x_remain);
+        check_and_deposit_opt(sender, y_remain);
+        check_and_deposit_opt(sender, z_remain);
+        check_and_deposit(sender, coin_m);
+
+    }
+
+    public(friend) fun process_fee<X>(coin: &mut Coin<X>, fee_to: address, fee_bips: u8){
+        if (fee_bips == 0){
+            return
+        };
+        assert!(fee_bips < 30, E_FEE_BIPS_TO_LARGE);
+        let fee_value = coin::value(coin) * (fee_bips as u64) / 10000;
+        if (coin::is_account_registered<X>(fee_to)){
+            if (coin::is_account_registered<X>(@hippo_aggregator)){
+                coin::deposit(fee_to, coin::extract(coin, fee_value/2));
+                coin::deposit(@hippo_aggregator, coin::extract(coin, fee_value/2));
+            } else {
+                coin::deposit(fee_to, coin::extract(coin, fee_value));
+            }
+        } else {
+            if (coin::is_account_registered<X>(@hippo_aggregator)){
+                coin::deposit(@hippo_aggregator, coin::extract(coin, fee_value));
+            }
+        }
+    }
 }
